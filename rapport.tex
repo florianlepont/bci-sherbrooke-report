@@ -1,0 +1,66 @@
+\documentclass[a4paper,11pt,final]{report}
+
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{makeidx}
+\usepackage{blkarray}
+\usepackage{verbatim}
+\usepackage[final]{pdfpages} 
+\usepackage{hyperref}
+\usepackage{moreverb}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr} %pour header
+\usepackage[Lenny]{fncychap}
+\usepackage[french]{varioref}
+\usepackage [paper=a4paper,tmargin=2cm,bmargin=2.5cm,lmargin=3cm,rmargin=3cm]{geometry}
+\usepackage{caption}
+\usepackage{amsmath}% http://ctan.org/pkg/amsmath
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{1pt} %barre header et foot
+\renewcommand{\footrulewidth}{1pt}
+
+\makeindex
+\newcommand{\reporttitle}{\Huge{Interface Cerveau - Ordinateur à partir d'EEG}}    % Titre
+\newcommand{\reportauthor}{
+	\Large{Romain \textsc{Richard}}\\
+	\Large{Florian \textsc{Lepont}}
+	}% Auteur
+\newcommand{\reportsubject}{\huge{GIN 956 : Rapport de Projet de Recherche et Développement }} % Sujet
+\newcommand{\HRule}{\rule{\linewidth}{1.5mm}}
+
+\setlength{\parskip}{1ex} % Espace entre les paragraphes
+
+%entete et pied de page
+\chead{Interface Cerveau - Ordinateur à partir d'EEG}
+\lfoot{Faculté de Génie, UdeS}
+\rfoot{\thepage}
+
+\begin{document}
+  \renewcommand{\contentsname}{Sommaire}  %change table des matiere en sommaire
+  \include {title}
+  %\newpage\null\newpage
+  \include{remerciements}
+  \tableofcontents % Table des matieres
+  \thispagestyle{fancy}
+  \listoffigures
+  \thispagestyle{fancy}
+  \include {introduction}
+  \include {partie1}
+  \include {partie2}
+  \include {partie3}
+  \include {partie4}
+  \include {partie5}
+  \include {partie6}
+  \include {partie7}
+  \include {partie8}
+  \include {conclusion}
+  \bibliography{mybib}
+  \bibliographystyle{unsrt}
+  \include {annexes}
+\end{document}
+

@@ -1,0 +1,311 @@
+\part*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes} % Ajout dans la table des matieres
+
+
+
+
+\subsection* {Tableau comparatif des différents casques EEG proposés sur le marché}
+
+\begin{figure}[h]
+	\centering\includegraphics[width=17cm, angle=0]{images/ComparaisonCasques.jpg}
+\end{figure}
+
+
+
+
+\newpage
+\subsection* {Tableau comparatif des différents amplificateurs proposés sur le marché}
+
+\begin{figure}[h]
+	\centering\includegraphics[width=17cm, angle=0]{images/ComparaisonAmpli.jpg}
+\end{figure}
+
+
+
+\newpage
+\subsection* {Carte heuristique}
+
+\begin{figure}[h]
+	\centering\includegraphics[width=19cm,angle=90,]{images/CarteHeuristiqueSignalProcessing.png}
+\end{figure}
+\newpage
+\subsubsection{Sujet filtrage ICA}
+
+\begin{verbatim}
+%##########################################################################
+%#####     SUJET DE TP DE COURS DE TRAITEMENT DE SIGNAL AVANCE    #########
+%#######################   ICA     ########################################
+%### Florian Lepont, Romain Richard######### Avril 2015####################
+
+close all
+clear all
+
+% LECTURE DES DONNEES A PARTIR DU FICHIER CSV
+donnees_eeg = lecture_csv('données_entrée.csv')
+
+% ANALYSE EN COMPOSANTES INDEPENDANTES
+sources = ica(donnees_eeg) % on récupère les données du fichier
+
+% AFFICHAGE DES DONNNEES
+subplot(2,2,1) 
+plot(donnees_eeg')
+xlabel('temps (s)')
+ylabel('amplitude (mV)')
+
+subplot(2,2,2)
+plot(sources')
+xlabel('temps (s)')
+ylabel('amplitude (mV)')
+
+subplot(2,2,3)
+hist(donnees_eeg')
+xlabel('amplitude (mV)')
+ylabel('nombres de données')
+
+subplot(2,2,4)
+xlabel('temps (s)')
+ylabel('amplitude du signal (mV)')
+
+hist(sources')
+xlabel('amplitude (mV)')
+ylabel('nombres de données')
+
+% CREATION DU FICHIER DE SORTIE
+ecriture_csv( 'données_entrée.csv', 'données_EEG_sortie.csv', sources)
+\end{verbatim}
+
+
+
+\newpage
+\subsubsection{Correction filtrage ICA}
+
+\begin{verbatim}
+%##########################################################################
+%#####     CORRECTION FONCTION COURS TRAITEMENT SIGNAL AVANCE #############
+%#######################   ICA     ########################################
+%### Florian Lepont, Romain Richard######### Avril 2015####################
+
+% Bibliographie : "A Tutorial on Independant Component Analysis" de Jonathon Shlens
+
+function sources = ica(donnees)
+% Analyse en composantes indépendantes.
+% ENTREE : données à traiter
+% SORTIE : Matrice de transformation linéaire, signaux sources calculés
+
+[M,N] = size(donnees);
+
+%  Translation de la moyenne des données vers 0.
+mn = mean(donnees,2);
+donnees = donnees - repmat(mn,1,N);
+
+% Calcul de la matrice de covariance
+covariance = 1 / (N-1) * (donnees * donnees');
+
+% Calcul des valeurs propres et des vecteurs propres de la matrice de
+% covariance.
+[E,D] = eig(covariance);
+
+%Calcul des données décoréllées et normalisation.
+X = sqrtm(pinv(D))*E'*donnees;
+
+%Calcul de la décomposition en valeurs singulières. (calcul de la
+%transformation linéraire - rotation - V).
+[V,s,u] = svd((repmat(sum(X.*X,1),M,1).*X)*X');
+
+%Calcul de la transformation linéaire W
+W = V * sqrtm(pinv(D)) * E';
+
+%Calcul des signaux sources
+sources = W * donnees;
+\end{verbatim}
+
+
+\newpage
+\subsubsection{Sujet filtrage PCA}
+
+\begin{verbatim}
+%##########################################################################
+%#######   SUJET DE TP DE COURS DE TRAITEMENT DE SIGNAL AVANCE    #########
+%#########################   PCA  #########################################
+%### Florian Lepont, Romain Richard######### Avril 2015####################
+
+close all
+clear all
+
+% LECTURE DES DONNEES A PARTIR DU FICHIER CSV
+donnees_eeg = lecture_csv('données_entrée.csv')
+
+% ANALYSE EN COMPOSANTES PRINCIPALES
+% On récupère les données du fichier
+[signaux_pca,composantes_principales,valeurs_propres] = pca(donnees_eeg) 
+
+% AFFICHAGE DES DONNNEES
+subplot(2,2,1) 
+plot(donnees_eeg')
+xlabel('temps (s)')
+ylabel('amplitude (mV)')
+
+subplot(2,2,2)
+plot(signaux_pca')
+xlabel('temps (s)')
+ylabel('amplitude (mV)')
+
+subplot(2,2,3)
+hist(donnees_eeg')
+xlabel('amplitude (mV)')
+ylabel('nombres de données')
+
+subplot(2,2,4)
+xlabel('temps (s)')
+ylabel('amplitude du signal (mV)')
+
+hist(signaux_pca')
+xlabel('amplitude (mV)')
+ylabel('nombres de données')
+
+% CREATION DU FICHIER DE SORTIE
+ecriture_csv( 'données_entrée.csv', 'données_EEG_sortie.csv', signaux_pca)
+\end{verbatim}
+
+
+\newpage
+\subsubsection{Correction filtrage PCA}
+
+\begin{verbatim}
+%##########################################################################
+%#####     CORRECTION FONCTION COURS TRAITEMENT SIGNAL AVANCE #############
+%#######################   PCA     ########################################
+%### Florian Lepont, Romain Richard######### Avril 2015####################
+
+% Bibliographie : "A Tutorial on Principal Component Analysis" de Jonathon Shlens
+
+function [signaux,composantes_principales,valeurs_propres] = pca(donnees)
+% Analyse en composantes principales.
+% ENTREE : données à traiter
+% SORTIE : Signaux décorrélés, vecteur des composantes principales,
+% vecteurs_propres
+
+[M,N] = size(donnees);
+
+%  Translation de la moyenne des données vers 0.
+mn = mean(donnees,2);
+donnees = donnees - repmat(mn,1,N);
+
+% Calcul de la matrice de covariance
+covariance = 1 / (N-1) * (donnees * donnees');
+
+% Calcul des valeurs propres et des vecteurs propres de la matrice de
+% covariance. Les vecteurs propres en sortie correspondent aux
+% composantes principales.
+[composantes_principales,valeurs_propres] = eig(covariance);
+
+% Extraction des valeurs propres de la matrice vers un vecteur
+valeurs_propres = diag(valeurs_propres);
+
+% Trie des valeurs propres par ordre décroissant
+[junk, indices] = sort(-1*valeurs_propres);
+valeurs_propres = valeurs_propres(indices);
+composantes_principales = composantes_principales(:,indices);
+
+% On réalise la transformation linéaire des données d'entrée
+signaux = composantes_principales'* donnees;
+\end{verbatim}
+
+
+
+
+\newpage
+\subsection*{Lecture CSV}
+
+\begin{verbatim}
+%##########################################################################
+%#####     FONCTION LECTURE D UNE FICHIER CSV    ##########################
+%#######################   CSV     ########################################
+%### Florian Lepont, Romain Richard######### Avril 2015####################
+
+function [donnees_eeg] = lecture_csv( fichier_entree )
+% Fonction lecture vers un fichier csv. La fonction permet de lire
+% les données EEG contenues dans le ficher csv 'fichier_entree'. 
+
+% EXTRACTION DES DONNEES EEG 
+% Extraction des données EEG à partir du fichier CSV
+% Suppression des infos temps et frequence d'échantillonnage afin de ne conserver 
+% que les données des signaux
+donnees_eeg(:,1) = [] 			
+donnees_eeg(:,end) = []     
+% Calcul de la transposée                                                
+donnees_eeg = donnees_eeg'			
+
+end
+\end{verbatim}
+
+
+
+
+\newpage
+\subsection*{Écriture CSV}
+
+\begin{verbatim}
+%##########################################################################
+%#####     FONCTION ECRITURE D UNE FICHIER CSV   ##########################
+%#######################   CSV     ########################################
+%### Florian Lepont, Romain Richard######### Avril 2015####################
+
+function [] = ecriture_csv( fichier_entree, fichier_sortie, donnees)
+% Fonction ecriture vers un fichier csv. La fonction permet d'ecrire
+% vers le ficher csv 'fichier_sortie'. Pour cela, il récupère les 
+% informations temps, fréq_echantill, colonnes et lignes à partir du
+% fichier csv 'fichier_entree', généré par OpenViBE. 
+
+% EXTRACTION DES DONNEES EEG ET CARACTERISTIQUES ACQUISITION
+% Extraction des données EEG
+donnees_eeg = csvread(fichier_entree,1,0);        
+% Extraction de la taille du tableau de données                          
+[lignes,colonnes] = size(donnees_eeg)        
+% La première colonne du fichier csv correspond aux échantillons temporels                               
+temps = donnees_eeg(:,1)           
+% La valeurs de la dernière colonne du fichier csv correpond à la fréquence
+% d'échantillonnage                                          
+freq_echant = donnees_eeg(1,end)                                           
+
+% EXTRACTION DU NOM DES VALEURS A PARTIR DU FICHIER D'ENTREE
+% Ouverture du fichier csv 
+fid = fopen(fichier_entree,'r');      
+% On récupère les données du fichier                                      
+C = textscan(fid, repmat('%s',1,colonnes), 'delimiter',',', 'CollectOutput',true); 
+C = C{1};
+% extraction de la première ligne du fichier, comprenant le nom des variables
+nom_valeurs = C(1,:);                                                       
+fclose(fid);
+
+% CREATION DU FICHIER DE SORTIE
+% Ouverture du nouveau fichier
+fid1 = fopen(fichier_sortie,'w');                                           
+
+% Concaténations des données temps et fréquence d'échantillonnage avec 
+% les nouvelles valeurs décoréllées
+donnees_csv = horzcat(temps, donnees')                                      
+donnees_csv(:,end+1) = zeros;
+donnees_csv(1,end) = freq_echant
+
+headerFmt = repmat('%s,',1,colonnes-1); 
+numFmt = repmat('%f,',1,colonnes-1);
+% Écriture de l'en-tête du csv (nom des variables)
+fprintf(fid1,[headerFmt,'%s\n'],nom_valeurs{1,:});    
+% Écriture des données                      
+fprintf(fid1,[numFmt,'%f\n'],donnees_csv');                                 
+
+fclose(fid1)
+end
+\end{verbatim}
+
+
+\input {sujet_GEI723}
+
+\input {sujet_GEI752}
+
+\newpage
+
+
+
+%\includepdf[pages=1]{pdf/Sujet_GEI723.pdf}
