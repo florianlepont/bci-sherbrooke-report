@@ -6,3 +6,17 @@
 .svn/format
 
 .svn/wc.db
+
+*.aux
+
+*.idx
+
+*.out
+
+*.log
+
+*.toc
+
+*.gz
+
+*.lof
